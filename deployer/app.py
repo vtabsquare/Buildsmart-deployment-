@@ -53,7 +53,25 @@ def update_keys_api():
 def get_config():
     env = get_buildsmart_env()
     refresh_token = env.get("GOOGLE_REFRESH_TOKEN") or get_local_google_refresh_token()
-    git_st = get_git_status()
+    # Use a lightweight git status that does NOT hit GitHub API (commits loaded separately via /api/git/commits)
+    from deployer.config import BUILDSMART_ROOT as _bs_root
+    if (_bs_root / ".git").is_dir():
+        git_st = get_git_status()
+    else:
+        # Cloud mode: return minimal git info so /api/config is fast; commits load via /api/git/commits
+        git_st = {
+            "initialized": True,
+            "branch": "main",
+            "clean": True,
+            "modified_files": [],
+            "remote_origin": DEFAULT_REPO_URL,
+            "last_commit": "",
+            "latest_commit_details": None,
+            "commits": [],
+            "approval": get_approval_state(),
+            "error": "",
+            "mode": "cloud_github_sync",
+        }
     service_name = request.args.get("service_name", "buildsmart-360")
     render_vars = get_render_env_vars(service_name)
 

@@ -47,13 +47,23 @@ function restoreRenderCredentials() {
 
 async function refreshLatestCommit(fetchRemote = false) {
   const btn = document.getElementById("btnRefreshCommits");
+  const approvalBadge = document.getElementById("commitApprovalBadge");
   if (btn) {
     btn.disabled = true;
     btn.innerText = "Checking...";
   }
+  if (approvalBadge) {
+    approvalBadge.className = "badge badge-info";
+    approvalBadge.innerText = "Fetching...";
+  }
 
   try {
-    const res = await fetch(`/api/git/commits?fetch=${fetchRemote ? "true" : "false"}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    const res = await fetch(`/api/git/commits?fetch=${fetchRemote ? "true" : "false"}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
     const data = await res.json();
     if (res.ok && data.success && data.latest) {
       latestCommitData = data.latest;
@@ -62,9 +72,33 @@ async function refreshLatestCommit(fetchRemote = false) {
       if (fetchRemote) {
         showToast("Fetched latest commits from GitHub!");
       }
+    } else if (res.ok && data.success && data.commits && data.commits.length > 0) {
+      latestCommitData = data.commits[0];
+      approvalState = data.approval || {};
+      updateCommitUI(latestCommitData, approvalState);
+    } else {
+      // Show a friendly error in the commit panel
+      const subjectEl = document.getElementById("commitSubject");
+      const hashEl = document.getElementById("commitHashBadge");
+      if (subjectEl) subjectEl.innerText = "Could not load commits — click 'Check for New Commits' to retry";
+      if (hashEl) hashEl.innerText = "------";
+      if (approvalBadge) {
+        approvalBadge.className = "badge badge-warning";
+        approvalBadge.innerText = "No commits found";
+      }
     }
   } catch (err) {
     console.warn("Could not fetch commits:", err);
+    const subjectEl = document.getElementById("commitSubject");
+    const hashEl = document.getElementById("commitHashBadge");
+    const timeEl = document.getElementById("commitTimestamp");
+    if (subjectEl) subjectEl.innerText = err.name === "AbortError" ? "GitHub fetch timed out — click 'Check for New Commits' to retry" : "Failed to load commits: " + err.message;
+    if (hashEl) hashEl.innerText = "------";
+    if (timeEl) timeEl.innerText = "";
+    if (approvalBadge) {
+      approvalBadge.className = "badge badge-warning";
+      approvalBadge.innerText = "Fetch failed";
+    }
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -257,7 +291,12 @@ async function loadInitialConfig() {
       approvalState = appConfig.git.approval || {};
       updateCommitUI(latestCommitData, approvalState);
     } else {
-      refreshLatestCommit(false);
+      // Cloud mode: always fetch from GitHub API, with retry
+      refreshLatestCommit(true);
+      // Auto-retry after 5s in case of cold start delay
+      setTimeout(() => {
+        if (!latestCommitData) refreshLatestCommit(true);
+      }, 5000);
     }
 
     // Step 4 Environment Variables

@@ -213,8 +213,11 @@ def get_git_status(fetch_remote: bool = False) -> dict:
                 "mode": "local_git",
             }
 
-    # Cloud/Render mode: query GitHub API directly
-    commits = fetch_github_api_commits(limit=5)
+    # Cloud/Render mode: query GitHub API directly (with short timeout to avoid blocking /api/config)
+    try:
+        commits = fetch_github_api_commits(limit=5)
+    except Exception:
+        commits = []
     latest = commits[0] if commits else None
     return {
         "initialized": True,
