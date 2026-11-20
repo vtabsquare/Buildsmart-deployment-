@@ -114,6 +114,30 @@
           </div>
         </div>
 
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
+          </div>
+        </div>
+
         <!-- Quick Integration Keys Setup (Useful when running on Render) -->
         <div class="card mt-4" id="keysSetupCard">
           <div class="card-title-row">
@@ -141,6 +165,30 @@
               <button class="btn btn-primary btn-sm" onclick="saveIntegrationKeys()">Save & Apply Keys</button>
               <span class="text-muted text-sm" id="keysSaveStatus" style="align-self: center;"></span>
             </div>
+          </div>
+        </div>
+
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
           </div>
         </div>
 
@@ -209,6 +257,30 @@
               <input type="text" class="input" id="commitMessageInput" placeholder="Enter commit message (e.g. 'deploy: prepare release for Render')">
               <button class="btn btn-primary" onclick="commitChanges()" id="btnCommit">Commit All Changes</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
           </div>
         </div>
 
@@ -302,6 +374,30 @@
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
           </div>
         </div>
 
@@ -407,6 +503,30 @@
           </div>
         </div>
 
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
+          </div>
+        </div>
+
         <!-- Tab 2: Manual Deployment Helper -->
         <div class="tab-content hidden" id="tabContentManual">
           <div class="card">
@@ -433,6 +553,30 @@
               <pre id="envVarsText">Loading...</pre>
             </div>
             <button class="btn btn-secondary mt-2" onclick="copyEnvVars()">Copy All Environment Variables</button>
+          </div>
+        </div>
+
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
           </div>
         </div>
 
@@ -474,6 +618,30 @@
           </div>
         </div>
 
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
+          </div>
+        </div>
+
         <!-- Live Health Check Card -->
         <div class="card mt-4">
           <div class="card-title-row">
@@ -498,6 +666,30 @@
             <a href="#" target="_blank" class="btn btn-accent btn-large" id="btnOpenLiveApp">
               Open Live BuildSmart 360 Application &rarr;
             </a>
+          </div>
+        </div>
+
+        <!-- Manual Commit Entry (shown when GitHub API is rate limited) -->
+        <div class="card mt-4 hidden" id="manualCommitBox" style="border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.05);">
+          <div class="card-title-row">
+            <div>
+              <h3>⚠️ Manual Commit Approval</h3>
+              <span class="text-muted text-sm">GitHub API is rate limited on this server — enter the commit hash manually</span>
+            </div>
+          </div>
+          <p class="card-desc">
+            Find your latest commit hash on <a href="https://github.com/vtabsquare/Build-smart-application/commits/main" target="_blank" class="link">GitHub → vtabsquare/Build-smart-application → Commits</a>.
+            Copy the first 7–40 characters of the hash and paste it below.
+          </p>
+          <div class="flex-row gap-2 mt-3">
+            <input type="text" class="input flex-1 font-mono" id="manualCommitHashInput"
+              placeholder="e.g. ce71362 or ce7136296f4435be2c9d6397ffb6a84515afb105">
+            <button class="btn btn-primary" onclick="approveManualCommit()">✅ Approve This Commit</button>
+          </div>
+          <div class="alert alert-info mt-3">
+            <strong>Permanent Fix:</strong> Add a <code>GITHUB_TOKEN</code> environment variable in your 
+            <a href="https://dashboard.render.com" target="_blank" class="link">Render Dashboard → Environment</a>
+            to avoid this rate limit. Generate a token at <a href="https://github.com/settings/tokens" target="_blank" class="link">github.com/settings/tokens</a> (no scopes needed for public repos).
           </div>
         </div>
 

@@ -122,15 +122,19 @@ def git_status_api():
 
 @app.route("/api/git/commits")
 def git_commits_api():
+    import os
     fetch = request.args.get("fetch", "false").lower() == "true"
     commits = get_latest_commits(limit=10, fetch=fetch)
     approval = get_approval_state()
     latest = commits[0] if commits else None
+    has_token = bool(os.environ.get("GITHUB_TOKEN") or os.environ.get("GITHUB_PAT") or os.environ.get("GH_TOKEN"))
     return jsonify({
         "success": True,
         "commits": commits,
         "latest": latest,
         "approval": approval,
+        "rate_limited": len(commits) == 0 and not has_token,
+        "has_github_token": has_token,
     })
 
 

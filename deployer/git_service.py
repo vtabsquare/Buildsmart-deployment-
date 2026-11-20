@@ -88,17 +88,22 @@ def save_approval_state(commit_hash: str, approver: str = "Administrator", notes
 
 def fetch_github_api_commits(repo_url: str = DEFAULT_REPO_URL, limit: int = 10) -> list[dict]:
     """Fetch commits directly from GitHub API when running without a local git clone."""
+    import os
     try:
         clean_url = repo_url.strip().rstrip("/").removesuffix(".git")
         parts = clean_url.split("/")
         if len(parts) >= 2:
             owner, repo = parts[-2], parts[-1]
             api_url = f"https://api.github.com/repos/{owner}/{repo}/commits?per_page={limit}"
-            req = requests.get(
-                api_url,
-                headers={"User-Agent": "BuildSmart-Deployer", "Accept": "application/vnd.github.v3+json"},
-                timeout=10,
-            )
+            headers = {"User-Agent": "BuildSmart-Deployer", "Accept": "application/vnd.github.v3+json"}
+            # Use token if available to avoid rate limiting on Render shared IPs
+            github_token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GITHUB_PAT") or os.environ.get("GH_TOKEN")
+            if github_token:
+                headers["Authorization"] = f"Bearer {github_token}"
+            req = requests.get(api_url, headers=headers, timeout=10)
+            if req.status_code == 403 or req.status_code == 429:
+                print(f"GitHub API rate limited (HTTP {req.status_code}). Set GITHUB_TOKEN env var to avoid this.")
+                return []
             if req.ok:
                 items = req.json()
                 commits = []
@@ -130,6 +135,8 @@ def fetch_github_api_commits(repo_url: str = DEFAULT_REPO_URL, limit: int = 10) 
                         "approver": approval_data.get("approver") if is_approved else None,
                     })
                 return commits
+            else:
+                print(f"GitHub API error: HTTP {req.status_code} - {req.text[:200]}")
     except Exception as e:
         print(f"Error fetching commits from GitHub API: {e}")
     return []

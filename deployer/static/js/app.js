@@ -80,12 +80,20 @@ async function refreshLatestCommit(fetchRemote = false) {
       // Show a friendly error in the commit panel
       const subjectEl = document.getElementById("commitSubject");
       const hashEl = document.getElementById("commitHashBadge");
-      if (subjectEl) subjectEl.innerText = "Could not load commits — click 'Check for New Commits' to retry";
+      const timeEl = document.getElementById("commitTimestamp");
+      if (data && data.rate_limited) {
+        if (subjectEl) subjectEl.innerHTML = `⚠️ GitHub API rate limited on this server. Set <strong>GITHUB_TOKEN</strong> in Render Environment Variables to fix this.`;
+        showToast("GitHub API rate limited — add GITHUB_TOKEN in Render env vars", "error");
+      } else {
+        if (subjectEl) subjectEl.innerText = "No commits found — click 'Check for New Commits' to retry";
+      }
       if (hashEl) hashEl.innerText = "------";
+      if (timeEl) timeEl.innerText = "";
       if (approvalBadge) {
         approvalBadge.className = "badge badge-warning";
-        approvalBadge.innerText = "No commits found";
+        approvalBadge.innerText = (data && data.rate_limited) ? "⚠️ Rate Limited" : "No commits found";
       }
+      showManualCommitEntry();
     }
   } catch (err) {
     console.warn("Could not fetch commits:", err);
@@ -343,6 +351,46 @@ function prevStep(step) {
 // ==========================================
 // STEP 1: Pre-Flight Verification & Credentials
 // ==========================================
+
+function showManualCommitEntry() {
+  const box = document.getElementById("manualCommitBox");
+  if (box) box.classList.remove("hidden");
+}
+
+async function approveManualCommit() {
+  const input = document.getElementById("manualCommitHashInput");
+  const hash = input ? input.value.trim() : "";
+  if (!hash) { showToast("Please enter a commit hash", "error"); return; }
+  try {
+    const res = await fetch("/api/git/approve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commit_hash: hash, approver: "Workspace Owner", notes: "Manually approved via cloud deployer" }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      approvalState = data.approval;
+      latestCommitData = {
+        hash: data.approval.approved_commit,
+        short_hash: data.approval.short_hash,
+        subject: data.approval.subject,
+        author_name: data.approval.author,
+        author_email: "",
+        date: data.approval.approved_at,
+        is_on_origin: true,
+        approved: true,
+      };
+      updateCommitUI(latestCommitData, approvalState);
+      showToast(`Commit ${data.approval.short_hash} approved for deployment!`);
+      const box = document.getElementById("manualCommitBox");
+      if (box) box.classList.add("hidden");
+    } else {
+      showToast(data.error || "Failed to approve commit", "error");
+    }
+  } catch (err) {
+    showToast("Error: " + err.message, "error");
+  }
+}
 
 async function saveIntegrationKeys() {
   const refreshToken = document.getElementById("inputGoogleRefreshToken")?.value?.trim();
