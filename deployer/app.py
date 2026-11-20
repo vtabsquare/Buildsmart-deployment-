@@ -32,6 +32,23 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/api/config/update-keys", methods=["POST"])
+def update_keys_api():
+    data = request.json or {}
+    allowed_keys = [
+        "GOOGLE_OAUTH_CLIENT_ID",
+        "GOOGLE_OAUTH_CLIENT_SECRET",
+        "GOOGLE_REFRESH_TOKEN",
+        "BREVO_API_KEY",
+        "BUILDSMART_SHEET_ID",
+        "BREVO_SENDER_EMAIL",
+    ]
+    updates = {k: data[k] for k in allowed_keys if k in data and data[k]}
+    from deployer.config import update_in_memory_keys
+    update_in_memory_keys(updates)
+    return jsonify({"success": True, "updated": list(updates.keys())})
+
+
 @app.route("/api/config")
 def get_config():
     env = get_buildsmart_env()

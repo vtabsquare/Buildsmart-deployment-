@@ -302,8 +302,41 @@ function prevStep(step) {
 }
 
 // ==========================================
-// STEP 1: Pre-Flight Verification
+// STEP 1: Pre-Flight Verification & Credentials
 // ==========================================
+
+async function saveIntegrationKeys() {
+  const refreshToken = document.getElementById("inputGoogleRefreshToken")?.value?.trim();
+  const brevoKey = document.getElementById("inputBrevoApiKey")?.value?.trim();
+  const statusEl = document.getElementById("keysSaveStatus");
+
+  if (!refreshToken && !brevoKey) {
+    if (statusEl) statusEl.innerText = "Please enter at least one key.";
+    return;
+  }
+  if (statusEl) statusEl.innerText = "Applying credentials...";
+  try {
+    const res = await fetch("/api/config/update-keys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        GOOGLE_REFRESH_TOKEN: refreshToken,
+        BREVO_API_KEY: brevoKey,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (statusEl) statusEl.innerText = "Applied successfully! Retesting...";
+      showToast("Credentials saved to session!");
+      if (refreshToken) verifyGoogleSheets();
+      if (brevoKey) verifyEmailDelivery();
+    } else {
+      if (statusEl) statusEl.innerText = "Failed: " + (data.error || "Unknown error");
+    }
+  } catch (err) {
+    if (statusEl) statusEl.innerText = "Error: " + err.message;
+  }
+}
 
 async function verifyGoogleSheets() {
   const btn = document.getElementById("btnVerifyGoogle");

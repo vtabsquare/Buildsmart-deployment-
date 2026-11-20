@@ -13,6 +13,17 @@ if not BUILDSMART_ROOT.is_dir() and (DEPLOYER_ROOT / "app").is_dir():
 KEY_REGEX = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 DEFAULT_REPO_URL = os.environ.get("TARGET_REPO_URL", "https://github.com/vtabsquare/Build-smart-application.git")
 
+_in_memory_keys = {}
+
+
+def update_in_memory_keys(keys_dict: dict):
+    global _in_memory_keys
+    for k, v in keys_dict.items():
+        if v and isinstance(v, str) and v.strip():
+            clean_v = v.strip()
+            _in_memory_keys[k.strip()] = clean_v
+            os.environ[k.strip()] = clean_v
+
 
 def read_env_file(env_path: Path) -> dict:
     entries = {}
@@ -35,7 +46,9 @@ def read_env_file(env_path: Path) -> dict:
 
 
 def get_local_google_refresh_token() -> str:
-    """Read cached refresh token from local SQLite or environment variable."""
+    """Read cached refresh token from in-memory, env var, or local SQLite."""
+    if _in_memory_keys.get("GOOGLE_REFRESH_TOKEN"):
+        return _in_memory_keys["GOOGLE_REFRESH_TOKEN"]
     if os.environ.get("GOOGLE_REFRESH_TOKEN"):
         return os.environ.get("GOOGLE_REFRESH_TOKEN")
     try:
@@ -69,6 +82,10 @@ def get_buildsmart_env() -> dict:
     for key, val in os.environ.items():
         if val and (key not in entries or not entries[key]):
             entries[key] = val
+
+    # Merge in-memory keys
+    for key, val in _in_memory_keys.items():
+        entries[key] = val
 
     # Default non-secret configurations
     defaults = {

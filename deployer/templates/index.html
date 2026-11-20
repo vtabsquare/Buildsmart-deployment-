@@ -114,6 +114,36 @@
           </div>
         </div>
 
+        <!-- Quick Integration Keys Setup (Useful when running on Render) -->
+        <div class="card mt-4" id="keysSetupCard">
+          <div class="card-title-row">
+            <div class="icon-wrap icon-settings">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div>
+              <h3>Cloud API Keys & Integration Tokens</h3>
+              <span class="text-muted">Provide or update credentials directly in this session</span>
+            </div>
+          </div>
+          <p class="card-desc">If running in cloud production on Render, you can enter your credentials below or configure them in the Render Dashboard under Environment.</p>
+          <div id="keysDrawer" class="mt-3">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="label">Google OAuth Refresh Token</label>
+                <input type="password" class="input font-mono" id="inputGoogleRefreshToken" placeholder="Paste Google Refresh Token (1//0g_...)">
+              </div>
+              <div class="form-group">
+                <label class="label">Brevo API Key</label>
+                <input type="password" class="input font-mono" id="inputBrevoApiKey" placeholder="Paste Brevo API Key (xkeysib-...)">
+              </div>
+            </div>
+            <div class="flex-row gap-2 mt-3">
+              <button class="btn btn-primary btn-sm" onclick="saveIntegrationKeys()">Save & Apply Keys</button>
+              <span class="text-muted text-sm" id="keysSaveStatus" style="align-self: center;"></span>
+            </div>
+          </div>
+        </div>
+
         <!-- Application Test Suite Card -->
         <div class="card mt-4">
           <div class="card-title-row">
