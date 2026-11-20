@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildSmart 360 — Standalone Render Deployment Manager</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <h1>BuildSmart 360</h1>
+          <p class="subtitle">Standalone Render Deployment Application</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-accent" id="workspaceBadge">Loading workspace...</span>
+        <span class="badge badge-success">v1.8.0 Production Ready</span>
+      </div>
+    </header>
+
+    <!-- Progress Steps Tracker -->
+    <div class="stepper-card">
+      <div class="stepper">
+        <div class="step-node active" id="stepNode1" onclick="jumpToStep(1)">
+          <div class="step-circle">1</div>
+          <div class="step-label">Pre-Flight Check</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node" id="stepNode2" onclick="jumpToStep(2)">
+          <div class="step-circle">2</div>
+          <div class="step-label">Git Verification</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node" id="stepNode3" onclick="jumpToStep(3)">
+          <div class="step-circle">3</div>
+          <div class="step-label">GitHub Push</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node" id="stepNode4" onclick="jumpToStep(4)">
+          <div class="step-circle">4</div>
+          <div class="step-label">Render Deploy</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node" id="stepNode5" onclick="jumpToStep(5)">
+          <div class="step-circle">5</div>
+          <div class="step-label">Live Verification</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN STEP CONTAINER -->
+    <main class="main-content">
+
+      <!-- STEP 1: Pre-Flight Verification -->
+      <section class="step-section active" id="stepSection1">
+        <div class="section-header">
+          <h2>Step 1: Pre-Flight & Integration Verification</h2>
+          <p>Verify that your Google Sheets connection, OAuth tokens, and Brevo email services are fully operational before deploying to Render.</p>
+        </div>
+
+        <div class="grid-2">
+          <!-- Google Sheets Card -->
+          <div class="card">
+            <div class="card-title-row">
+              <div class="icon-wrap icon-google">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <div>
+                <h3>Google Sheets & Drive</h3>
+                <span class="text-muted" id="sheetIdPreview">Checking sheet...</span>
+              </div>
+              <span class="status-indicator" id="googleStatusBadge">Pending</span>
+            </div>
+            <p class="card-desc">Tests reading the 5 required tabs (`material_rates`, `material_master`, `system_settings`, `city_indexes`, `Estimates`) using your OAuth refresh token.</p>
+            <div class="card-actions">
+              <button class="btn btn-primary" onclick="verifyGoogleSheets()" id="btnVerifyGoogle">
+                Verify Google Sheet Now
+              </button>
+            </div>
+            <div class="result-box hidden" id="googleResultBox"></div>
+          </div>
+
+          <!-- Brevo Email Card -->
+          <div class="card">
+            <div class="card-title-row">
+              <div class="icon-wrap icon-email">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <h3>Brevo Transactional Email</h3>
+                <span class="text-muted" id="brevoSenderPreview">Checking sender...</span>
+              </div>
+              <span class="status-indicator" id="emailStatusBadge">Pending</span>
+            </div>
+            <p class="card-desc">Sends a test email to your verified address (`vitabsquare@gmail.com`) to confirm SMTP/API credentials.</p>
+            <div class="card-actions">
+              <button class="btn btn-secondary" onclick="verifyEmailDelivery()" id="btnVerifyEmail">
+                Send Test Email
+              </button>
+            </div>
+            <div class="result-box hidden" id="emailResultBox"></div>
+          </div>
+        </div>
+
+        <!-- Application Test Suite Card -->
+        <div class="card mt-4">
+          <div class="card-title-row">
+            <div class="icon-wrap icon-code">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div>
+              <h3>Isolated Unit & Workflow Tests</h3>
+              <span class="text-muted">Runs 20 automated tests in BuildSmart_New</span>
+            </div>
+            <span class="status-indicator" id="testsStatusBadge">Not Run</span>
+          </div>
+          <p class="card-desc">Verifies estimation calculation, permission contracts, audit logs, PDF generation, and rates fallback.</p>
+          <div class="card-actions">
+            <button class="btn btn-secondary" onclick="runTestSuite()" id="btnRunTests">
+              Run Test Suite (20 Tests)
+            </button>
+          </div>
+          <pre class="terminal-box hidden" id="testOutputBox"></pre>
+        </div>
+
+        <div class="step-footer">
+          <div></div>
+          <button class="btn btn-accent" onclick="nextStep(2)">Proceed to Step 2: Git Verification &rarr;</button>
+        </div>
+      </section>
+
+      <!-- STEP 2: Git Verification -->
+      <section class="step-section hidden" id="stepSection2">
+        <div class="section-header">
+          <h2>Step 2: Git Repository & Secrets Protection</h2>
+          <p>Render deploys directly from your Git repository. Ensure your code is committed and that sensitive files (`.env`, `data/`) are properly ignored.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title-row">
+            <div>
+              <h3>Git Repository Status</h3>
+              <span class="text-muted" id="gitBranchDisplay">Branch: main</span>
+            </div>
+            <span class="status-indicator" id="gitCleanBadge">Checking...</span>
+          </div>
+
+          <div class="stat-grid mt-3">
+            <div class="stat-card">
+              <div class="stat-label">Repository Status</div>
+              <div class="stat-value text-success" id="gitInitText">Initialized</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Last Commit</div>
+              <div class="stat-value text-mono" id="gitLastCommit">Loading...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Remote Origin</div>
+              <div class="stat-value text-mono" id="gitRemoteDisplay">Not Set</div>
+            </div>
+          </div>
+
+          <div class="mt-4" id="uncommittedFilesWrap">
+            <h4>Modified / Untracked Files:</h4>
+            <ul class="file-list" id="uncommittedFilesList"></ul>
+            <div class="commit-form mt-3">
+              <input type="text" class="input" id="commitMessageInput" placeholder="Enter commit message (e.g. 'deploy: prepare release for Render')">
+              <button class="btn btn-primary" onclick="commitChanges()" id="btnCommit">Commit All Changes</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn btn-ghost" onclick="prevStep(1)">&larr; Back to Step 1</button>
+          <button class="btn btn-accent" onclick="nextStep(3)">Proceed to Step 3: GitHub Push &rarr;</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: GitHub Remote & Push -->
+      <section class="step-section hidden" id="stepSection3">
+        <div class="section-header">
+          <h2>Step 3: Connect & Push to GitHub</h2>
+          <p>Connect your local repository to GitHub so that Render can pull and build your web service.</p>
+        </div>
+
+        <div class="card">
+          <h3>GitHub Remote Repository</h3>
+          <p class="card-desc">Enter your GitHub repository HTTPS clone URL (e.g., <code>https://github.com/your-username/buildsmart-360.git</code>):</p>
+          
+          <div class="flex-row gap-2 mt-3">
+            <input type="url" class="input flex-1" id="githubRepoUrlInput" value="https://github.com/vtabsquare/Build-smart-application.git" placeholder="https://github.com/vtabsquare/Build-smart-application.git">
+            <button class="btn btn-secondary" onclick="saveRemoteUrl()">Set Remote</button>
+          </div>
+
+          <div class="alert alert-info mt-4">
+            <strong>Tip:</strong> If you haven't created the repository on GitHub yet:
+            <ol class="mt-2 pl-4">
+              <li>Open <a href="https://github.com/new" target="_blank" class="link">github.com/new</a> in a new tab.</li>
+              <li>Name it <code>buildsmart-360</code>, select <strong>Private</strong>, and click <strong>Create repository</strong>.</li>
+              <li>Copy its HTTPS URL, paste it above, and click <strong>Push to GitHub</strong>.</li>
+            </ol>
+          </div>
+
+          <div class="card-actions mt-4">
+            <button class="btn btn-primary btn-large" onclick="pushToGitHub()" id="btnPushGitHub">
+              Push to GitHub (Branch: main)
+            </button>
+          </div>
+
+          <pre class="terminal-box hidden mt-3" id="gitPushOutput"></pre>
+        </div>
+
+        <!-- Latest GitHub Commit & Deployment Approval Card -->
+        <div class="card mt-4" id="commitApprovalCard">
+          <div class="card-title-row">
+            <div>
+              <h3>Latest GitHub Commit & Deployment Approval</h3>
+              <span class="text-muted" id="commitSubtitle">Verify the latest repository commit and authorize deployment</span>
+            </div>
+            <div class="flex-row gap-2 align-center">
+              <span class="badge badge-warning" id="commitApprovalBadge">Checking...</span>
+              <button class="btn btn-sm btn-secondary" onclick="refreshLatestCommit(true)" title="Fetch latest commits from GitHub" id="btnRefreshCommits">
+                🔄 Check for New Commits
+              </button>
+            </div>
+          </div>
+
+          <!-- Commit Details Panel -->
+          <div class="commit-detail-box mt-3" id="commitDetailBox">
+            <div class="commit-header-row">
+              <div class="flex-row gap-2 align-center">
+                <span class="badge badge-accent font-mono" id="commitHashBadge">-------</span>
+                <span class="badge badge-success font-mono" id="commitBranchBadge">origin/main</span>
+                <span class="badge badge-outline" id="commitSyncBadge">In Sync</span>
+              </div>
+              <div class="text-muted text-sm font-mono" id="commitTimestamp">Loading date...</div>
+            </div>
+
+            <div class="commit-message-wrap mt-3">
+              <div class="commit-subject" id="commitSubject">Loading latest commit message...</div>
+              <div class="commit-meta text-muted text-sm mt-1" id="commitAuthor">Author: Loading...</div>
+            </div>
+          </div>
+
+          <!-- Approval Action Card / Banner -->
+          <div class="approval-actions-box mt-3" id="approvalActionsBox">
+            <div class="flex-row gap-3 align-center justify-between flex-wrap">
+              <div class="approval-info-text">
+                <strong id="approvalPromptTitle">Deployment Authorization:</strong>
+                <p class="text-muted text-sm mt-1" id="approvalPromptDesc">
+                  Review the latest commit above. Click "Approve Commit" to verify this release and unlock deployment.
+                </p>
+              </div>
+              <div class="flex-row gap-2 align-center">
+                <button class="btn btn-primary" onclick="approveCurrentCommit()" id="btnApproveCommit">
+                  ✅ Approve Commit for Deployment
+                </button>
+                <button class="btn btn-accent hidden" onclick="quickDeployApprovedCommit()" id="btnQuickDeploy">
+                  🚀 Deploy Approved Commit to Render &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn btn-ghost" onclick="prevStep(2)">&larr; Back to Step 2</button>
+          <button class="btn btn-accent" onclick="nextStep(4)">Proceed to Step 4: Render Deployment &rarr;</button>
+        </div>
+      </section>
+
+      <!-- STEP 4: Render Deployment -->
+      <section class="step-section hidden" id="stepSection4">
+        <div class="section-header">
+          <h2>Step 4: Deploy to Render</h2>
+          <p>Deploy your web service automatically using the Render REST API, or configure it via the Render Dashboard.</p>
+        </div>
+
+        <!-- Render Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchDeployTab('auto')" id="tabAutoBtn">Automated Deployment (via Render API)</button>
+          <button class="tab-btn" onclick="switchDeployTab('manual')" id="tabManualBtn">Manual Dashboard Deployment</button>
+        </div>
+
+        <!-- Tab 1: Automated Deployment -->
+        <div class="tab-content" id="tabContentAuto">
+          <div class="card">
+            <h3>1-Click Automated Render Deployment</h3>
+            <p class="card-desc">Provide your Render API Key to create the service and automatically configure all 15 environment variables in one click.</p>
+
+            <!-- Target Commit Banner in Step 4 -->
+            <div class="commit-target-banner mt-3" id="step4CommitBanner">
+              <div class="flex-row justify-between align-center flex-wrap gap-2">
+                <div>
+                  <div class="text-xs uppercase text-muted tracking-wide">Target Commit for Render Deployment:</div>
+                  <div class="flex-row gap-2 align-center mt-1">
+                    <span class="badge badge-accent font-mono" id="step4CommitHash">-------</span>
+                    <strong class="text-sm" id="step4CommitSubject">Loading latest commit...</strong>
+                  </div>
+                  <div class="text-xs text-muted mt-1" id="step4CommitMeta">Author • Date</div>
+                </div>
+                <div class="text-right flex-row gap-2 align-center">
+                  <span class="badge badge-warning" id="step4ApprovalBadge">Pending Approval</span>
+                  <button class="btn btn-xs btn-primary" onclick="approveCurrentCommit()" id="step4ApproveBtn">Approve Now</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <label>Render API Key:</label>
+              <div class="flex-row gap-2">
+                <input type="password" class="input flex-1" id="renderApiKeyInput" placeholder="rnd_xxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                <button class="btn btn-secondary" onclick="fetchRenderOwners()">Connect & Fetch Workspaces</button>
+              </div>
+              <small class="text-muted">Generate a key in <a href="https://dashboard.render.com/u/settings#api-keys" target="_blank" class="link">Render Account Settings &rarr; API Keys</a>.</small>
+            </div>
+
+            <div class="grid-2 mt-3">
+              <div class="form-group">
+                <label>Select Render Workspace / Owner:</label>
+                <select class="input" id="renderOwnerSelect">
+                  <option value="">Connect API Key first...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Service Name:</label>
+                <input type="text" class="input" id="renderServiceNameInput" value="buildsmart-360">
+              </div>
+              <div class="form-group">
+                <label>Region:</label>
+                <select class="input" id="renderRegionSelect">
+                  <option value="singapore" selected>Singapore (Fastest for India/Asia)</option>
+                  <option value="oregon">Oregon (US West)</option>
+                  <option value="ohio">Ohio (US East)</option>
+                  <option value="frankfurt">Frankfurt (Europe)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Instance Plan:</label>
+                <select class="input" id="renderPlanSelect">
+                  <option value="free" selected>Free (750 hrs/month)</option>
+                  <option value="starter">Starter ($7/mo - supports persistent disk)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="card-actions mt-4">
+              <button class="btn btn-primary btn-large" onclick="triggerRenderDeploy()" id="btnRenderDeploy">
+                Deploy BuildSmart 360 to Render Now
+              </button>
+            </div>
+
+            <!-- Deploy progress card -->
+            <div class="deploy-progress-wrap hidden mt-4" id="deployProgressWrap">
+              <h4>Deployment Status: <span class="badge badge-accent" id="deployStatusBadge">Initializing</span></h4>
+              <div class="progress-bar-bg mt-2">
+                <div class="progress-bar-fill" id="deployProgressBar" style="width: 20%"></div>
+              </div>
+              <p class="mt-2 text-muted" id="deployStatusText">Creating service on Render...</p>
+              <div class="live-url-box hidden mt-3" id="liveUrlBox">
+                <strong>Your Deployed Service URL:</strong>
+                <a href="#" target="_blank" id="liveServiceLink" class="link font-bold"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Manual Deployment Helper -->
+        <div class="tab-content hidden" id="tabContentManual">
+          <div class="card">
+            <h3>Manual Render Configuration Helper</h3>
+            <p class="card-desc">If you prefer deploying directly via the Render Web Dashboard, follow these pre-configured settings:</p>
+            
+            <div class="spec-table mt-3">
+              <div class="spec-row">
+                <span class="spec-key">Runtime</span>
+                <span class="spec-val">Python</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-key">Build Command</span>
+                <span class="spec-val"><code>pip install -r requirements.txt</code></span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-key">Start Command</span>
+                <span class="spec-val"><code>python app/production.py --host 0.0.0.0 --port $PORT</code></span>
+              </div>
+            </div>
+
+            <h4 class="mt-4">Environment Variables (Ready to Copy):</h4>
+            <div class="env-vars-box" id="envVarsCopyBox">
+              <pre id="envVarsText">Loading...</pre>
+            </div>
+            <button class="btn btn-secondary mt-2" onclick="copyEnvVars()">Copy All Environment Variables</button>
+          </div>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn btn-ghost" onclick="prevStep(3)">&larr; Back to Step 3</button>
+          <button class="btn btn-accent" onclick="nextStep(5)">Proceed to Step 5: Verification &rarr;</button>
+        </div>
+      </section>
+
+      <!-- STEP 5: Live Verification & OAuth Redirect -->
+      <section class="step-section hidden" id="stepSection5">
+        <div class="section-header">
+          <h2>Step 5: Google Cloud Redirect & Live Health Verification</h2>
+          <p>Register your assigned Render URL in Google Cloud Console and verify end-to-end functionality.</p>
+        </div>
+
+        <!-- Google OAuth Redirect URI Card -->
+        <div class="card">
+          <div class="card-title-row">
+            <div class="icon-wrap icon-google">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <h3>Register Authorized Redirect URI in Google Cloud</h3>
+              <span class="text-muted">Required for Google OAuth verification</span>
+            </div>
+          </div>
+
+          <p class="card-desc mt-2">Add this exact URL to your Google Cloud OAuth Client's <strong>Authorized redirect URIs</strong>:</p>
+          <div class="code-copy-row mt-2">
+            <code id="googleRedirectUriDisplay">https://buildsmart-360.onrender.com/setup/google/callback</code>
+            <button class="btn btn-sm btn-secondary" onclick="copyRedirectUri()">Copy URI</button>
+          </div>
+
+          <div class="mt-3">
+            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="btn btn-secondary">
+              Open Google Cloud Credentials Console &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Live Health Check Card -->
+        <div class="card mt-4">
+          <div class="card-title-row">
+            <div class="icon-wrap icon-heart">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div>
+              <h3>Live Web Service Health Check</h3>
+              <span class="text-muted">Verify live endpoints, Google Sheets sync, and database status</span>
+            </div>
+            <span class="status-indicator" id="liveHealthBadge">Not Verified</span>
+          </div>
+
+          <div class="flex-row gap-2 mt-3">
+            <input type="url" class="input flex-1" id="liveHealthUrlInput" placeholder="https://<your-render-name>.onrender.com">
+            <button class="btn btn-primary" onclick="verifyLiveService()" id="btnVerifyLive">Verify Live Health</button>
+          </div>
+
+          <div class="result-box hidden mt-3" id="liveHealthResultBox"></div>
+
+          <div class="card-actions mt-4 hidden" id="openLiveAppWrap">
+            <a href="#" target="_blank" class="btn btn-accent btn-large" id="btnOpenLiveApp">
+              Open Live BuildSmart 360 Application &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="step-footer">
+          <button class="btn btn-ghost" onclick="prevStep(4)">&larr; Back to Step 4</button>
+          <div></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
