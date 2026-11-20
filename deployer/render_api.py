@@ -72,9 +72,17 @@ class RenderClient:
         branch: str = "main",
         region: str = "singapore",
         plan: str = "free",
+        build_command: str = "pip install -r requirements.txt",
+        start_command: str = None,
         env_vars: list[dict] = None,
     ) -> dict:
         """Create a new Web Service on Render."""
+        if not start_command:
+            if "deploy" in repo_url.lower() or "deploy" in name.lower():
+                start_command = "gunicorn deployer.app:app"
+            else:
+                start_command = "python app/production.py --host 0.0.0.0 --port $PORT"
+
         payload = {
             "type": "web_service",
             "name": name,
@@ -87,8 +95,8 @@ class RenderClient:
                 "plan": plan,
                 "region": region,
                 "envSpecificDetails": {
-                    "buildCommand": "pip install -r requirements.txt",
-                    "startCommand": "python app/production.py --host 0.0.0.0 --port $PORT",
+                    "buildCommand": build_command or "pip install -r requirements.txt",
+                    "startCommand": start_command,
                 },
             },
             "envVars": env_vars or [],

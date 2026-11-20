@@ -191,7 +191,13 @@ def render_deploy():
     if not api_key or not owner_id or not repo_url or not service_name:
         return jsonify({"success": False, "error": "Missing required fields"}), 400
 
-    env_vars = get_render_env_vars(service_name)
+    if "deploy" in repo_url.lower() or "deploy" in service_name.lower():
+        env_vars = [
+            {"key": "PYTHON_VERSION", "value": "3.11.9"},
+            {"key": "TARGET_REPO_URL", "value": "https://github.com/vtabsquare/Build-smart-application.git"},
+        ]
+    else:
+        env_vars = get_render_env_vars(service_name)
     client = RenderClient(api_key)
 
     try:
